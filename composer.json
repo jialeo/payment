@@ -1,0 +1,20 @@
+{
+    "name": "jialeo/payment",
+    "description": "Alipay,Unicompay",
+    "keywords": ["Alipay", "Unicompay"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Liang",
+            "email": "chenjialiang@han-zi.cn"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "JiaLeo\\Payment\\": "src/"
+        }
+    }
+}
