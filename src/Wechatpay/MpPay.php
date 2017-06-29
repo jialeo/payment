@@ -38,7 +38,7 @@ class MpPay extends BasePay
         //签名
         $pay_sigin_data['paySign'] = $this->makeSign($pay_sigin_data);
 
-        return json_encode($pay_sigin_data);
+        return $pay_sigin_data;
     }
 
 

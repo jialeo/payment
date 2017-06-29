@@ -175,5 +175,36 @@ class BaseWechatpay
         }
     }
 
+    /**
+     * 设置自定义字段
+     * @param array $data
+     * @return string
+     */
+    public function setPassbackParams(array $data)
+    {
+        $str_arr = array();
+        foreach ($data as $key => $v) {
+            $str_arr[] = $key . '--' . $v;
+        }
+
+        $str = implode('---', $str_arr);
+        return $str;
+    }
+
+    /**
+     * 获取自定义字段
+     * @param $str
+     * @return array
+     */
+    public function getPassbackParams($str)
+    {
+        $str_arr = explode('---', $str);
+        $data = array();
+        foreach ($str_arr as $v) {
+            $temp = explode('--', $v);
+            $data[$temp[0]] = $temp[1];
+        }
+        return $data;
+    }
 
 }
