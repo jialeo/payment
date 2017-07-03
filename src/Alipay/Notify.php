@@ -15,6 +15,7 @@ class Notify extends BaseAlipay
      */
     public function handle()
     {
+
         //获取回调信息
         $data = empty($_POST) ? $_GET : $_POST;
         if (empty($data) || !is_array($data)) {

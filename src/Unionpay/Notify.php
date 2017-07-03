@@ -15,6 +15,7 @@ class Notify extends BaseUnionpay
      */
     public function handle()
     {
+
         if (empty($_POST) && empty($_GET)) {
             return false;
         }

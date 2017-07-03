@@ -25,7 +25,8 @@ class Refund extends BaseWechatpay
             'nonce_str' => $this->getNonceStr(),
             'out_refund_no' => $params['out_refund_no'],
             'total_fee' => $params['total_fee'],
-            'refund_fee' => $params['refund_fee']
+            'refund_fee' => $params['refund_fee'],
+            'refund_account' => isset($params['refund_account']) ? $params['refund_account'] : 'REFUND_SOURCE_RECHARGE_FUNDS',//余额退款
         );
 
         if (isset($params['out_trade_no'])) {
@@ -41,8 +42,13 @@ class Refund extends BaseWechatpay
 
         $res = $this->postXmlCurl($url, $xml, $this->config['sslcert_path'], $this->config['sslkey_path']);
         $get_result = $this->fromXml($res);
+
         if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
-            throw new PaymentException('退款失败!接口返回错误信息:' . isset($get_result['return_msg']) ? $get_result['return_msg'] : '');
+            throw new PaymentException('退款失败!接口返回错误信息:' . (isset($get_result['return_msg']) ? $get_result['return_msg'] : ''));
+        }
+
+        if (!isset($get_result['result_code']) || $get_result['result_code'] != 'SUCCESS') {
+            throw new PaymentException('退款失败!接口返回错误信息:' . (isset($get_result['err_code_des']) ? $get_result['err_code_des'] : ''));
         }
 
         //验证签名
