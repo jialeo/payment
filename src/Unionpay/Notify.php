@@ -15,7 +15,6 @@ class Notify extends BaseUnionpay
      */
     public function handle()
     {
-        \Log::error($_POST);
 
         if (empty($_POST) && empty($_GET)) {
             return false;
@@ -34,7 +33,6 @@ class Notify extends BaseUnionpay
             throw new PaymentException('交易失败!');
         }
 
-        \Log::error($res);
         return $data;
     }
 

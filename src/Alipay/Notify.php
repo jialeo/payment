@@ -15,7 +15,6 @@ class Notify extends BaseAlipay
      */
     public function handle()
     {
-        \Log::error($_POST);
 
         //获取回调信息
         $data = empty($_POST) ? $_GET : $_POST;
@@ -36,7 +35,6 @@ class Notify extends BaseAlipay
             throw new PaymentException('验证签名失败!');
         }
 
-        \Log::error($flag);
         return $data;
     }
 

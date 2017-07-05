@@ -84,12 +84,11 @@ class BasePay extends BaseAlipay
 
         $sign_params['sign'] = $sign;
 
-        if($is_app){
+        if($is_app) {
             return http_build_query($sign_params);
         }
-        else{
-            $url = $this->gateway . '?' . http_build_query($sign_params);
-            return redirect($url);
+        else {
+            return $this->gateway . '?' . http_build_query($sign_params);
         }
     }
 }
