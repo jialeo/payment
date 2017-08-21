@@ -18,9 +18,9 @@ class AppPay extends BasePay
      * @param $params
      * @throws PaymentException
      */
-    public function handle($params)
+    public function handle($params, $is_app = true)
     {
-        $url = parent::handle($params,true);
+        $url = parent::handle($params, true);
 
         return $url;
     }
