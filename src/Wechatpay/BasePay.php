@@ -30,8 +30,6 @@ class BasePay extends BaseWechatpay
             $ip_address = $params['create_ip'];
         }
 
-        \Log::error($ip_address);
-
         //必传参数
         $data = array(
             'appid' => $this->config['appid'],
