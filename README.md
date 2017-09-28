@@ -32,22 +32,24 @@
 
 ## 文档
 
-*  [支付宝](doc/alipay.md)
-*  [微信](doc/wechatpay.md)
+*  [支付宝](doc/Alipay.md)
+*  [微信支付](doc/Wechatpay.md)
+*  银联支付  (拖延症中...)
+*  Paypal	  (拖延症中...)
 
 ## 安装使用
 
 * 通过composer(推荐)
 
 	```
-	composer require "jialeo/payment:~4.0.0"
+	composer require "jialeo/payment"
 	```
     
 * composer.json
 
 	```
 	"require": {
-        "jialeo/payment": "~4.0.0"
+        "jialeo/payment": "0.*"
     }
 	```
     
