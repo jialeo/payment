@@ -7,6 +7,9 @@ class Transfer extends BaseWechatpay
 {
     public $payUrl = '/mmpaymkttransfers/promotion/transfers';
 
+    public $errorCode;  //错误代码
+    public $errorCodeDes;   //错误描述
+
     /**
      * 企业付款到零钱
      * @return mixed
@@ -16,7 +19,7 @@ class Transfer extends BaseWechatpay
     {
         //检查订单号是否合法
         if (empty($params['partner_trade_no'])) {
-            throw new PaymentException('商户订单号订单号不能为空');
+            throw new PaymentException('商户订单号不能为空');
         }
 
         // 需要转账金额不能低于1
@@ -29,7 +32,7 @@ class Transfer extends BaseWechatpay
         }
 
         $is_check_name = !empty($params['check_name']) ? true : false;
-        if (empty($params['re_user_name'])) {
+        if (empty($params['re_user_name']) && $is_check_name) {
             throw new PaymentException('校验用户姓名选项为验证时,收款用户姓名(re_user_name)不能为空');
         }
 
@@ -44,8 +47,8 @@ class Transfer extends BaseWechatpay
         }
 
         $data = array(
-            'appid' => $this->config['appid'],
-            'mch_id' => $this->config['mchid'],
+            'mch_appid' => $this->config['appid'],
+            'mchid' => $this->config['mchid'],
             'nonce_str' => $this->getNonceStr(),
             'partner_trade_no' => $params['partner_trade_no'],
             'amount' => $params['amount'],
@@ -70,15 +73,21 @@ class Transfer extends BaseWechatpay
         $result = $this->postXmlCurl($this->gateway . $this->payUrl, $xml, $this->config['sslcert_path'], $this->config['sslkey_path']);
         $get_result = $this->fromXml($result);
 
-        if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
-            throw new PaymentException('调起支付失败!错误信息:' . isset($get_result['return_msg']) ? $get_result['return_msg'] : $get_result);
+        try {
+            if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
+                throw new PaymentException('调起支付失败!错误信息:' . isset($get_result['return_msg']) ? $get_result['return_msg'] : $get_result);
+            }
+
+            if ($get_result['result_code'] != 'SUCCESS') {
+                throw new PaymentException('调起支付失败!错误信息:' . isset($get_result['err_code_des']) ? $get_result['err_code_des'] : $get_result);
+            }
+        } catch (\Exception $e) {
+            $this->errorCode = $get_result['err_code'];
+            $this->errorCodeDes = $get_result['err_code_des'];
+
+            return false;
         }
 
-        //验证签名
-        $check_sigin = $this->makeSign($get_result);
-        if ($check_sigin != $get_result['sign']) {
-            throw new PaymentException('调起支付失败!错误信息:返回数据验证数据失败!');
-        }
 
         return $get_result;
     }
