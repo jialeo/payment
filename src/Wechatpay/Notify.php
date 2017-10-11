@@ -17,13 +17,7 @@ class Notify extends BaseWechatpay
     public function handle()
     {
         $postdata = file_get_contents("php://input");
-
-        \Log::error($postdata);
-
         $get_notify = $this->fromXml($postdata);
-
-
-        \Log::error($get_notify);
 
         try {
 
