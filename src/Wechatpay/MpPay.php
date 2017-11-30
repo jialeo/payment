@@ -12,9 +12,8 @@ use JiaLeo\Payment\Common\PaymentException;
 class MpPay extends BasePay
 {
 
-    public $trade_type = 'JSAPI';
+    public $tradeType = 'JSAPI';
     public $device = 'MP';
-
 
     /**
      * 下单处理

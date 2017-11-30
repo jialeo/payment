@@ -116,7 +116,7 @@ class BasePay extends BaseWechatpay
             throw new PaymentException("缺少统一支付接口必填参数total_fee,并且长度不能超过88位！");
         }
 
-        if (!in_array($this->tradeType, ['JSAPI', 'NATIVE', 'APP'])) {
+        if (!in_array($this->tradeType, ['JSAPI', 'NATIVE', 'APP', 'MWEB'])) {
             throw new PaymentException("trade_type参数错误！");
         }
 
