@@ -15,15 +15,48 @@ $config = array(
 
 ## 即时到账接口
 
+<<<<<<< HEAD
 示
 例代码：
 
 ```php
 if ($data['device'] == 'wap') {
+=======
+
+1. 判断设备选择实例化的
+
+公众号
+
+```php
+$wechatpay = new \JiaLeo\Payment\Wechatpay\MpPay($config);  
+```
+
+```
+App
+```php
+$wechatpay = new \JiaLeo\Payment\ Wechatpay\AppPay($config);
+```
+H5
+```php
+$wechatpay = new \JiaLeo\Payment\ Wechatpay\H5Pay($config);
+```
+
+
+示例代码：
+
+```php
+if ($data['device'] == 'mp') {
+>>>>>>> develop
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\MpPay($config);
 } elseif ($data['device'] == 'app') {
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\AppPay($config);
 }
+<<<<<<< HEAD
+=======
+elseif($data['device'] == 'h5'){
+	$wechatpay = new \JiaLeo\Payment\Wechatpay\H5Pay($config);
+}
+>>>>>>> develop
 
 $out_trade_no = date('YmdHis') . rand(10000, 99999);
 
@@ -39,10 +72,25 @@ $pay_data = [
 $url = $wechatpay->handle($pay_data);
 ```
 
+<<<<<<< HEAD
 返回的url为微信的签名
 
 #
 ## 支付回调处理
+=======
+MpPay和AppPay返回的url为微信的签名，只要直接给到客户端给可以了。
+
+
+H5Pay为微信返回的url，需要额外重定向和指定支付完成后的跳转地址：
+
+```php
+$redirect_url = request()->getSchemeAndHttpHost() . '/api/test2';
+$to_url = $url.'&redirect_url='.urlencode($redirect_url);
+header('Refresh:0.5,Url=' . $to_url);
+```
+
+### 支付回调处理
+>>>>>>> develop
 
 示例代码：
 
@@ -61,8 +109,12 @@ try {
 }
 ```
 
+<<<<<<< HEAD
 #
 ## 退款
+=======
+### 退款
+>>>>>>> develop
 
 示例代码：
 
@@ -80,12 +132,19 @@ $refund_data = [
 $wechatpay_refund->handle($refund_data);
 ```
 
+<<<<<<< HEAD
 #
 ## 企业付款
+=======
+### 企业付款
+
+* 企业付款到零钱
+>>>>>>> develop
 
 示例代码：
 
 ```php
+<<<<<<< HEAD
 $payment = new \JiaLeo\Payment\Wechatpay\Transfer($config);
 
 $params = array(
@@ -104,6 +163,62 @@ if (!$res) {
 dump($res);
 ```
 
+=======
+$config = config('payment.wechatpay.mp');
+$payment = new \JiaLeo\Payment\Wechatpay\Transfer($config);
+$params = array(
+	'partner_trade_no' => time() . rand(10000, 99999), //转账订单号
+	'openid' => 'oErxPsxn6XTQQyFzauQW9qZYtI_k', //openid
+	'amount' => 100, //转账金额(单位:分)
+	'desc' => '测试转账', //备注
+	//'check_name' => true //是否验证实名
+);
+$res = $payment->handle($params);
+if (!$res) {
+	var_dump($payment->errorCode, $payment->errorCodeDes);
+}
+var_dump($res);
+```
+
+* 企业付款到银行卡
+
+	1. 调用获取RSA公钥API获取RSA公钥，落地成本地文件，假设为rsa_public.pem
+	
+		```php
+		$config = config('payment.wechatpay.che');
+		$wechatpay = new \JiaLeo\Payment\Wechatpay\Tools($config);
+		$url = $wechatpay->getPublicKey();
+		var_dump($url['pub_key']);
+		```
+		
+	2. PKCS#1 转 PKCS#8 (微信获取的是PKCS#1的格式，php必须读取PKCS#8)
+
+		```
+		openssl rsa -RSAPublicKey_in -in <filename> -pubout
+		```
+		
+		替换原证书内容
+		
+	3. 执行
+	
+		```php
+		$config = config('payment.wechatpay.che');
+		$wechatpay = new \JiaLeo\Payment\Wechatpay\Transfer($config);
+		
+		$data = array(
+			'partner_trade_no' => time(),
+			'amount' => 100,
+			'bank_no' => '62148312XXXXXX',
+			'true_name' => 'XXX',
+			'bank_code' => '1001',
+			'desc' => 'test',
+		);
+		
+		
+		var_dump($wechatpay->handleToBank($data));
+		```
+
+>>>>>>> develop
 
 ## 红包
 

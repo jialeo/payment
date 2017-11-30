@@ -139,7 +139,6 @@ class BaseWechatpay
         /*curl_setopt($ch,CURLOPT_PROXY, "0.0.0.0");
         curl_setopt($ch,CURLOPT_PROXYPORT, 8080);*/
 
-
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);//严格校验

@@ -1,4 +1,8 @@
 <?php
+/**
+ * 红包
+ */
+
 namespace JiaLeo\Payment\Wechatpay;
 
 use JiaLeo\Payment\Common\PaymentException;

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 公众号场景下单并支付
+ * APP场景下单并支付
  */
 
 namespace JiaLeo\Payment\Wechatpay;
@@ -12,7 +12,7 @@ use JiaLeo\Payment\Common\PaymentException;
 class AppPay extends BasePay
 {
 
-    public $trade_type = 'APP';
+    public $tradeType = 'APP';
     public $device = 'APP';
 
 
