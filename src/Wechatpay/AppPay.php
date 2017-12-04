@@ -13,7 +13,7 @@ class AppPay extends BasePay
 {
 
     public $tradeType = 'APP';
-    public $device = 'APP';
+    public $device = 'WEB';
 
 
     /**
@@ -29,9 +29,8 @@ class AppPay extends BasePay
 
         $pay_sigin_data = array(
             'appid' => $this->config['appid'],
-            'timeStamp' => "$time",
-            'nonceStr' => $this->getNonceStr(),
-            'signType' => 'MD5',
+            'timestamp' => "$time",
+            'noncestr' => $this->getNonceStr(),
             'package' => 'Sign=WXPay',
             'partnerid' => $this->config['mchid'],
             'prepayid' => $pay_info['prepay_id']
