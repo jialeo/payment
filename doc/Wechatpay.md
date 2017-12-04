@@ -10,6 +10,7 @@ $config = array(
     'key' => '', 			//填写你设定的key
     'sslcert_path' => '/your/path/cert/wechatpay/apiclient_cert.pem'
     'sslkey_path' => '/your/path/cert/wechatpay/apiclient_key.pem',
+    'transfer_rsa_public_path' => '/your/path/cert/wechatpay/rsa_public.pem',	//企业转账到银行卡rsa公钥证书文件路径
 );
 ```
 
