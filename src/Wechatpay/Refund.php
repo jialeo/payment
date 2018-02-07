@@ -2,6 +2,7 @@
 
 namespace JiaLeo\Payment\Wechatpay;
 
+use App\Exceptions\ApiException;
 use JiaLeo\Payment\Common\PaymentException;
 
 
@@ -9,6 +10,9 @@ class Refund extends BaseWechatpay
 {
     public $payUrl = '/secapi/pay/refund';
     public $rawData = array();
+    public $refundReturnData;  //退款返回的原始数据
+    public $refundReturnCode;  //退款返回的状态码
+    public $refundResultCode;  //退款返回的业务结果
 
     /**
      * 回调
@@ -26,7 +30,6 @@ class Refund extends BaseWechatpay
             'out_refund_no' => $params['out_refund_no'],
             'total_fee' => $params['total_fee'],
             'refund_fee' => $params['refund_fee'],
-            'refund_account' => isset($params['refund_account']) ? $params['refund_account'] : 'REFUND_SOURCE_RECHARGE_FUNDS',//余额退款
         );
 
         if (isset($params['out_trade_no'])) {
@@ -35,13 +38,26 @@ class Refund extends BaseWechatpay
             $data['transaction_id'] = $params['transaction_id'];
         }
 
+        if(isset($params['refund_account'])){
+            $data['refund_account'] = $params['refund_account'];
+        }
+
         //签名
         $data['sign'] = $this->makeSign($data);
+        $this->rawData = $data;
         $xml = $this->toXml($data);
         $url = $this->gateway . $this->payUrl;
 
         $res = $this->postXmlCurl($url, $xml, $this->config['sslcert_path'], $this->config['sslkey_path']);
         $get_result = $this->fromXml($res);
+
+        if (!$get_result) {
+            throw new PaymentException('退款接口数据返回解析失败!');
+        }
+
+        $this->refundReturnData = $get_result;
+        $this->refundReturnCode = $get_result['return_code'];
+        $this->refundResultCode = isset($get_result['result_code'])?$get_result['result_code']:'';
 
         if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
             throw new PaymentException('退款失败!接口返回错误信息:' . (isset($get_result['return_msg']) ? $get_result['return_msg'] : ''));
@@ -95,6 +111,10 @@ class Refund extends BaseWechatpay
 
         if (isset($params['refund_desc']) && mb_strlen($params['refund_desc']) > 80) {
             throw new PaymentException('退款原因(refund_desc)能大于80位!');
+        }
+
+        if (isset($params['refund_account']) && !in_array($params['refund_account'], ['REFUND_SOURCE_RECHARGE_FUNDS', 'REFUND_SOURCE_UNSETTLED_FUNDS'])) {
+            throw new PaymentException('退款资金来源(refund_account)的值只能为REFUND_SOURCE_RECHARGE_FUNDS或REFUND_SOURCE_UNSETTLED_FUNDS!');
         }
 
         return true;

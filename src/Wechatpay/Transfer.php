@@ -188,6 +188,51 @@ class Transfer extends BaseWechatpay
     }
 
     /**
+     * 查询企业打款信息
+     * @param $params
+     *        $params[partner_trade_no] int 商户订单号
+     *        $params[nonce_str] string 随机字符串，长度小于32位
+     * @return bool|mixed
+     * @throws PaymentException
+     */
+    public function queryBankOrder($params)
+    {
+        $this->payUrl = '/mmpaysptrans/query_bank';
+
+        $param = [
+            'mch_id' => $this->config['mchid'],
+            'partner_trade_no' => $params['partner_trade_no'],
+            'nonce_str' => $params['nonce_str'],
+        ];
+
+        // 签名
+        $sign = $this->makeSign($param);
+        $param['sign'] = $sign;
+
+        //转换成xml
+        $xml = $this->toXml($param);
+        $result = $this->postXmlCurl($this->gateway . $this->payUrl, $xml, $this->config['sslcert_path'], $this->config['sslkey_path']);
+        $get_result = $this->fromXml($result);
+
+        try {
+            if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
+                throw new PaymentException('查询企业打款到银行卡信息!错误信息:' . isset($get_result['return_msg']) ? $get_result['return_msg'] : $get_result);
+            }
+
+            if ($get_result['result_code'] != 'SUCCESS') {
+                throw new PaymentException('查询企业打款到银行卡信息!错误信息:' . isset($get_result['err_code_des']) ? $get_result['err_code_des'] : $get_result);
+            }
+        } catch (\Exception $e) {
+            $this->errorCode = $get_result['err_code'];
+            $this->errorCodeDes = $get_result['err_code_des'];
+
+            return false;
+        }
+
+        return $get_result;
+    }
+
+    /**
      * RSA公钥加密
      * @param $str
      * @return string
