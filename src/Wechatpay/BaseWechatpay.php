@@ -10,7 +10,6 @@ class BaseWechatpay
     public $config = array();
 
     protected $gateway = 'https://api.mch.weixin.qq.com';    //支付网关
-    public $refundReturnData;  //退款返回的原始数据
 
     public function __construct($config)
     {
