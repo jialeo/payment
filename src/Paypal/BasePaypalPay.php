@@ -21,11 +21,11 @@ class BasePaypalPay
             $this->gateway = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
             $this->nvp_api = 'https://api-3t.sandbox.paypal.com/nvp';
             $this->end_point = 'https://api.sandbox.paypal.com';
-        }else{
+        } else {
             $this->gateway = 'https://www.paypal.com/cgi-bin/webscr';
             $this->nvp_api = 'https://api-3t.paypal.com/nvp';
             $this->end_point = 'https://api.paypal.com';
-        }  
+        }
     }
 
     /**
@@ -43,42 +43,42 @@ class BasePaypalPay
 
         //api 版本
         $version = urlencode('90');
-    
+
         // 设置crul参数.
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->nvp_api);
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
-    
+
         // 关闭服务器SSL验证。
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
-    
+
         // 设置API操作，版本，和请求的API签名。
         $nvpreq = "METHOD=$method_name&VERSION=$version&PWD=$api_password&USER=$api_username&SIGNATURE=$api_signature$nvp_str";
-    
+
         // 设置POST请求参数
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq."&".$nvp_str);
-    
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq . "&" . $nvp_str);
+
         // 获取请求响应体
         $http_response = curl_exec($ch);
-    
-        if( !$http_response){
-            throw new PaymentException($method_name . ' 失败: ' . curl_error($ch) . '(' . curl_errno($ch) .')','HTTP_REQ_ERROR');
+
+        if (!$http_response) {
+            throw new PaymentException($method_name . ' 失败: ' . curl_error($ch) . '(' . curl_errno($ch) . ')', 'HTTP_REQ_ERROR');
         }
-    
+
         // 提取响应细节
         $http_response_ar = explode("&", $http_response);
 
         $http_parsed_response_ar = array();
-        foreach ($http_response_ar as $i => $value){
+        foreach ($http_response_ar as $i => $value) {
             $tmpAr = explode("=", $value);
-            if(sizeof($tmpAr) > 1){
-             $http_parsed_response_ar[$tmpAr[0]] = $tmpAr[1];
+            if (sizeof($tmpAr) > 1) {
+                $http_parsed_response_ar[$tmpAr[0]] = $tmpAr[1];
             }
         }
-    
+
         return $http_parsed_response_ar;
     }
 
@@ -91,7 +91,7 @@ class BasePaypalPay
     {
         $nvp_str = '';
         //遍历数组拼装nvp请求字符串
-        foreach($data as $i => $receiver_data) {
+        foreach ($data as $i => $receiver_data) {
             $receiver_email = urlencode($receiver_data['receiver_email']);
             $amount = urlencode($receiver_data['amount']);
             $unique_id = urlencode($receiver_data['unique_id']);
@@ -143,38 +143,38 @@ class BasePaypalPay
         $secret = $this->config['client_secret'];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->end_point."/v1/oauth2/token");
+        curl_setopt($ch, CURLOPT_URL, $this->end_point . "/v1/oauth2/token");
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
-        curl_setopt($ch, CURLOPT_USERPWD, $client_id.":".$secret);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, $client_id . ":" . $secret);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");
-         
+
         $result = curl_exec($ch);
         curl_close($ch);
-        if(empty($result))return false;
-        else
-        {
-            $json = json_decode($result,true);
+        if (empty($result)) return false;
+        else {
+            $json = json_decode($result, true);
 
             return $json['access_token'];
         }
     }
 
-    public function httpPostPaypal($url, $post_data, $header=array()) {
-     
+    public function httpPostPaypal($url, $post_data, $header = array())
+    {
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true) ; // 获取数据返回
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header) ; // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回array('Expect:')
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header); // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回array('Expect:')
         $output = curl_exec($ch);
-         
-        if ( curl_errno($ch) ){
+
+        if (curl_errno($ch)) {
             return false;
         }
-     
+
         return $output;
     }
 
@@ -208,7 +208,7 @@ class BasePaypalPay
 
         if ($res && strcmp($res, 'VERIFIED') == 0 && $data['receiver_email'] == $receiver_email) {
             return $data;
-        }else{
+        } else {
             throw new PaymentException('Paypal回调验证错误!');
         }
     }
