@@ -12,7 +12,7 @@ class Refund extends BasePaypalPay
      */
     public function handle($txn_id)
     {
-        $url = $this->end_point."/v1/payments/sale/$txn_id/refund";
+        $url = $this->end_point . "/v1/payments/sale/$txn_id/refund";
         $access_token = $this->getAccessToken();
         if (!$access_token) {
             return false;
@@ -23,14 +23,15 @@ class Refund extends BasePaypalPay
             "Authorization: Bearer $access_token"
         );
         $output = $this->httpPostPaypal($url, '{}', $header);
-    
+
         if (false === $output || false === $access_token) {
             //网络异常，请您稍后重试
             throw new PaymentException("网络异常，请您稍后重试");
         }
 
         $output = json_decode($output, TRUE);
-        var_dump($output);exit;
+        var_dump($output);
+        exit;
         if ("TRANSACTION_REFUSED" == $output['name']) {
             //退款已提交，请勿重复
             throw new PaymentException("退款已提交，请勿重复");

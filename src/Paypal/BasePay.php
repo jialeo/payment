@@ -8,23 +8,22 @@ class BasePay extends BasePaypalPay
     /**
      * 统一下单接口
      */
-    public function handle($params,$is_app = false)
+    public function handle($params, $is_app = false)
     {
         //检查参数
         $this->checkParams($params);
 
         $params['business'] = $this->config['account'];// 告诉paypal，我的（商城的商户）Paypal账号，就是这钱是付给谁的
         $params['cmd'] = '_xclick'; // 告诉Paypal，我的网站是用的我自己的购物车系统
-        $params['currency_code'] = isset($params['currency_code'])?$params['currency_code']:'USD'; // //告诉Paypal，我要用什么货币。这里需要注意的是，由于汇率问题，如果网站提供了更改货币的功能，那么上面的amount也要做适当更改，paypal是不会智能的根据汇率更改总额的
+        $params['currency_code'] = isset($params['currency_code']) ? $params['currency_code'] : 'USD'; // //告诉Paypal，我要用什么货币。这里需要注意的是，由于汇率问题，如果网站提供了更改货币的功能，那么上面的amount也要做适当更改，paypal是不会智能的根据汇率更改总额的
         $params['charset'] = 'utf-8';
-        $params['no_shipping'] = '1';
         $params['no_note'] = '1';
         $params['rm'] = '2';
-        $paypal_payment_url = $this->gateway .'?' . http_build_query($params);
+        $paypal_payment_url = $this->gateway . '?' . http_build_query($params);
 
-        if($is_app) {
+        if ($is_app) {
             return $params;
-        }else {
+        } else {
             return $paypal_payment_url;
         }
     }

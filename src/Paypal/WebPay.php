@@ -5,7 +5,6 @@
  */
 
 namespace JiaLeo\Payment\Paypal;
-use JiaLeo\Payment\Common\PaymentException;
 
 
 class WebPay extends BasePay
