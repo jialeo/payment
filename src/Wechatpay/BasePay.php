@@ -124,11 +124,5 @@ class BasePay extends BaseWechatpay
         if ($this->tradeType == "JSAPI" && !isset($params['openid'])) {
             throw new PaymentException("统一支付接口中，缺少必填参数openid！trade_type为JSAPI时，openid为必填参数！");
         }
-
-        if ($this->tradeType == "NATIVE" && !isset($params['product_id'])) {
-            throw new PaymentException("统一支付接口中，缺少必填参数product_id！trade_type为JSAPI时，product_id为必填参数！");
-        }
     }
-
-
 }

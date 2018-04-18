@@ -25,15 +25,24 @@ $config = array(
 $wechatpay = new \JiaLeo\Payment\Wechatpay\MpPay($config);  
 ```
 
-```
 App
+
 ```php
 $wechatpay = new \JiaLeo\Payment\ Wechatpay\AppPay($config);
 ```
+
 H5
+
 ```php
 $wechatpay = new \JiaLeo\Payment\ Wechatpay\H5Pay($config);
 ```
+
+Native
+
+```
+$wechatpay = new \JiaLeo\Payment\ Wechatpay\NativePay($config);
+```
+
 
 
 示例代码：
@@ -46,6 +55,9 @@ if ($data['device'] == 'mp') {
 }
 elseif($data['device'] == 'h5'){
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\H5Pay($config);
+}
+elseif ($data['device'] == 'native') {
+    $wechatpay = new \JiaLeo\Payment\Wechatpay\NativePay($config);
 }
 
 $out_trade_no = date('YmdHis') . rand(10000, 99999);
@@ -67,11 +79,7 @@ MpPay和AppPay返回的url为微信的签名，只要直接给到客户端给可
 
 H5Pay为微信返回的url，需要额外重定向和指定支付完成后的跳转地址：
 
-```php
-$redirect_url = request()->getSchemeAndHttpHost() . '/api/test2';
-$to_url = $url.'&redirect_url='.urlencode($redirect_url);
-header('Refresh:0.5,Url=' . $to_url);
-```
+NativePay返回的是一个微信支付url,使用第三方库直接转换成二维码即可
 
 ### 支付回调处理
 
@@ -222,3 +230,4 @@ if (!$res) {
 
 dump($res);
 ```
+

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 公众号场景下单并支付
+ * 扫码场景下单并支付
  */
 
 namespace JiaLeo\Payment\Wechatpay;
@@ -9,11 +9,11 @@ namespace JiaLeo\Payment\Wechatpay;
 use JiaLeo\Payment\Common\PaymentException;
 
 
-class H5Pay extends BasePay
+class NativePay extends BasePay
 {
 
-    public $tradeType = 'MWEB';
-    public $device = 'WEB';
+    public $tradeType = 'NATIVE';
+    public $device = 'NATIVE';
 
 
     /**
@@ -25,7 +25,7 @@ class H5Pay extends BasePay
     public function handle($params)
     {
         $pay_info = $this->pay($params);
-        return $pay_info['mweb_url'];
+        return $pay_info['code_url'];
     }
 
 }
