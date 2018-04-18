@@ -16,13 +16,6 @@ $config = array(
 
 ## 即时到账接口
 
-<<<<<<< HEAD
-示
-例代码：
-
-```php
-if ($data['device'] == 'wap') {
-=======
 
 1. 判断设备选择实例化的
 
@@ -32,32 +25,40 @@ if ($data['device'] == 'wap') {
 $wechatpay = new \JiaLeo\Payment\Wechatpay\MpPay($config);  
 ```
 
-```
 App
+
 ```php
 $wechatpay = new \JiaLeo\Payment\ Wechatpay\AppPay($config);
 ```
+
 H5
+
 ```php
 $wechatpay = new \JiaLeo\Payment\ Wechatpay\H5Pay($config);
 ```
+
+Native
+
+```
+$wechatpay = new \JiaLeo\Payment\ Wechatpay\NativePay($config);
+```
+
 
 
 示例代码：
 
 ```php
 if ($data['device'] == 'mp') {
->>>>>>> develop
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\MpPay($config);
 } elseif ($data['device'] == 'app') {
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\AppPay($config);
 }
-<<<<<<< HEAD
-=======
 elseif($data['device'] == 'h5'){
 	$wechatpay = new \JiaLeo\Payment\Wechatpay\H5Pay($config);
 }
->>>>>>> develop
+elseif ($data['device'] == 'native') {
+    $wechatpay = new \JiaLeo\Payment\Wechatpay\NativePay($config);
+}
 
 $out_trade_no = date('YmdHis') . rand(10000, 99999);
 
@@ -73,25 +74,14 @@ $pay_data = [
 $url = $wechatpay->handle($pay_data);
 ```
 
-<<<<<<< HEAD
-返回的url为微信的签名
-
-#
-## 支付回调处理
-=======
 MpPay和AppPay返回的url为微信的签名，只要直接给到客户端给可以了。
 
 
 H5Pay为微信返回的url，需要额外重定向和指定支付完成后的跳转地址：
 
-```php
-$redirect_url = request()->getSchemeAndHttpHost() . '/api/test2';
-$to_url = $url.'&redirect_url='.urlencode($redirect_url);
-header('Refresh:0.5,Url=' . $to_url);
-```
+NativePay返回的是一个微信支付url,使用第三方库直接转换成二维码即可
 
 ### 支付回调处理
->>>>>>> develop
 
 示例代码：
 
@@ -110,12 +100,7 @@ try {
 }
 ```
 
-<<<<<<< HEAD
-#
-## 退款
-=======
 ### 退款
->>>>>>> develop
 
 示例代码：
 
@@ -133,38 +118,13 @@ $refund_data = [
 $wechatpay_refund->handle($refund_data);
 ```
 
-<<<<<<< HEAD
-#
-## 企业付款
-=======
 ### 企业付款
 
 * 企业付款到零钱
->>>>>>> develop
 
 示例代码：
 
 ```php
-<<<<<<< HEAD
-$payment = new \JiaLeo\Payment\Wechatpay\Transfer($config);
-
-$params = array(
-'partner_trade_no' => time() . rand(10000, 99999), //转账订单号
-'openid' => 'oErxPsxn6XTQQyFzauQW9qZYtI_k', //openid
-'amount' => 100, //转账金额(单位:分)
-'desc' => '测试转账', //备注
-//'check_name' => true //是否验证实名
-);
-$res = $payment->handle($params);
-
-if (!$res) {
-	dump($payment->errorCode, $payment->errorCodeDes);
-}
-
-dump($res);
-```
-
-=======
 $config = config('payment.wechatpay.mp');
 $payment = new \JiaLeo\Payment\Wechatpay\Transfer($config);
 $params = array(
@@ -219,7 +179,6 @@ var_dump($res);
 		var_dump($wechatpay->handleToBank($data));
 		```
 
->>>>>>> develop
 
 ## 红包
 
@@ -271,3 +230,4 @@ if (!$res) {
 
 dump($res);
 ```
+

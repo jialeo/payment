@@ -42,5 +42,4 @@ class AppPay extends BasePay
         return $pay_sigin_data;
     }
 
-
 }
