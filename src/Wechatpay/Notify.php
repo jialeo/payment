@@ -8,6 +8,7 @@ use JiaLeo\Payment\Common\PaymentException;
 class Notify extends BaseWechatpay
 {
     public $rawData = array();
+    public $errorMsg = '';
 
     /**
      * 回调
@@ -34,6 +35,7 @@ class Notify extends BaseWechatpay
             }
 
         } catch (PaymentException $e) {
+            $this->errorMsg = $e->getMessage();
             return false;
         }
 
