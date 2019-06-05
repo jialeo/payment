@@ -92,7 +92,7 @@ class BasePay extends BaseAlipay
         }
         if ($is_qrcode){
             //请求接口获取二维码地址
-            $res = Curl::post($this->gateway,$sign_params);
+            $res = Curl::get($this->gateway . '?' . http_build_query($sign_params));//用get方法商品名称不会乱码
 
             return $res;
         }
