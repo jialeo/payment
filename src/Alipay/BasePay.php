@@ -2,6 +2,7 @@
 namespace JiaLeo\Payment\Alipay;
 
 use JiaLeo\Payment\Common\PaymentException;
+use JiaLeo\Payment\Common\Curl;
 
 class BasePay extends BaseAlipay
 {
@@ -10,7 +11,7 @@ class BasePay extends BaseAlipay
     /**
      * 即时到账接口
      */
-    public function handle($params,$is_app = false)
+    public function handle($params,$is_app = false, $is_qrcode = false)
     {
 
         // 检查订单号是否合法
@@ -35,6 +36,10 @@ class BasePay extends BaseAlipay
             throw new PaymentException('商品类型可取值为：0-虚拟类商品  1-实物类商品');
         }
 
+        if (!$is_qrcode){
+            $params['product_code'] = 'FAST_INSTANT_TRADE_PAY';
+        }
+
         // 返回参数进行urlencode编码
         if (!empty($params['passback_params']) && !is_string($params['passback_params'])) {
             throw new PaymentException('回传参数必须是字符串');
@@ -45,7 +50,6 @@ class BasePay extends BaseAlipay
         //dd($params['passback_params']);
 
         $params['total_amount'] = (string)($params['total_amount'] / 100);
-        $params['product_code'] = 'FAST_INSTANT_TRADE_PAY';
 
         //定义公共参数
         $publicParams = array(
@@ -73,7 +77,6 @@ class BasePay extends BaseAlipay
 
         //生成待签名字符串
         $str = $this->createLinkstring($sign_params);
-       // dd($str);
 
         //提取私钥
         $rsa_private_key = $this->getRsaKeyValue($this->config['rsa_private_key']);
@@ -87,8 +90,16 @@ class BasePay extends BaseAlipay
         if($is_app) {
             return http_build_query($sign_params);
         }
+        if ($is_qrcode){
+            //请求接口获取二维码地址
+            $res = Curl::post($this->gateway,$sign_params);
+
+            return $res;
+        }
         else {
             return $this->gateway . '?' . http_build_query($sign_params);
         }
     }
 }
+
+
