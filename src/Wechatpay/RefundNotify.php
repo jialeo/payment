@@ -51,7 +51,7 @@ class RefundNotify extends BaseWechatpay
             $get_notify = array_merge($get_notify, $decrypted_arr);
 
         } catch (PaymentException $e) {
-            \Log::info($e->getMessage());
+            //\Log::info($e->getMessage());
             return false;
         }
 
