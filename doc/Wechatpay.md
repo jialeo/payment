@@ -113,9 +113,38 @@ $refund_data = [
 	'out_refund_no' => $out_refund_no,//退款商户单号
 	'total_fee' => $amount, //原订单金额（单位分）
 	'refund_fee' => $refund_amount, //退款金额（单位分）
-	'out_trade_no' => $out_trade_no //原订单商户单号
+	'out_trade_no' => $out_trade_no, //原订单商户单号
+	'notify_url' => 'http://domain/api/wechatpay/notifies/' . $data['device'] //后台回调地址
 ];
 $wechatpay_refund->handle($refund_data);
+```
+
+### 退款回调处理
+
+示例代码：
+
+```php
+
+$wechatpay_refund = new \JiaLeo\Payment\Wechatpay\Refund($config);
+$out_refund_no = date('YmdHis').rand(10000, 99999);
+
+try {
+    //原路退款
+    $refund_data = [
+        'out_refund_no' => $out_refund_no,//退款商户单号
+        'total_fee' => $amount, //原订单金额（单位分）
+        'refund_fee' => $refund_amount, //退款金额（单位分）
+        'out_trade_no' => $out_trade_no, //原订单商户单号
+        'refund_account' => 'REFUND_SOURCE_UNSETTLED_FUNDS' //退款资金来源-未结算资金退款
+    ];
+
+    try {
+        $wechatpay_refund->handle($refund_data);
+    } catch(\Exception $e) {
+        $refund_data['refund_account']='REFUND_SOURCE_RECHARGE_FUNDS';  //退款资金来源-可用余额退款
+        $wechatpay_refund->handle($refund_data);
+    }
+}
 ```
 
 ### 企业付款

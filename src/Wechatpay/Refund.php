@@ -38,8 +38,12 @@ class Refund extends BaseWechatpay
             $data['transaction_id'] = $params['transaction_id'];
         }
 
-        if(isset($params['refund_account'])){
+        if (isset($params['refund_account'])) {
             $data['refund_account'] = $params['refund_account'];
+        }
+
+        if (isset($params['notify_url'])) {
+            $data['notify_url'] = $params['notify_url'];
         }
 
         //签名
@@ -57,7 +61,7 @@ class Refund extends BaseWechatpay
 
         $this->refundReturnData = $get_result;
         $this->refundReturnCode = $get_result['return_code'];
-        $this->refundResultCode = isset($get_result['result_code'])?$get_result['result_code']:'';
+        $this->refundResultCode = isset($get_result['result_code']) ? $get_result['result_code'] : '';
 
         if (!isset($get_result['return_code']) || $get_result['return_code'] != 'SUCCESS') {
             throw new PaymentException('退款失败!接口返回错误信息:' . (isset($get_result['return_msg']) ? $get_result['return_msg'] : ''));
