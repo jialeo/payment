@@ -46,6 +46,10 @@ class Refund extends BaseWechatpay
             $data['notify_url'] = $params['notify_url'];
         }
 
+        if (isset($params['refund_desc'])) {
+            $data['refund_desc'] = $params['refund_desc'];
+        }
+        
         //签名
         $data['sign'] = $this->makeSign($data);
         $this->rawData = $data;
