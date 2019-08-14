@@ -14,6 +14,7 @@ use JiaLeo\Payment\Common\PaymentException;
 class RefundNotify extends BaseWechatpay
 {
     public $rawData = array();
+    public $errorMsg = '';
 
     /**
      * 回调
@@ -27,6 +28,8 @@ class RefundNotify extends BaseWechatpay
         if (!$get_notify) {
             return false;
         }
+
+        $this->rawData = $get_notify;
 
         try {
 
@@ -51,7 +54,7 @@ class RefundNotify extends BaseWechatpay
             $get_notify = array_merge($get_notify, $decrypted_arr);
 
         } catch (PaymentException $e) {
-            //\Log::info($e->getMessage());
+            $this->errorMsg = $e->getMessage();
             return false;
         }
 
