@@ -19,6 +19,9 @@ class Notify extends BaseWechatpay
     {
         $postdata = file_get_contents("php://input");
         $get_notify = $this->fromXml($postdata);
+
+        $this->rawData = $get_notify;
+
         try {
 
             if (!isset($get_notify['return_code']) || $get_notify['return_code'] != 'SUCCESS') {
