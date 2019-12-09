@@ -110,13 +110,14 @@ class BaseAlipay
 
         reset($para);
         $arg = '';
-        while (list($key, $val) = each($para)) {
+        foreach ($para as $key => $val){
             if (is_array($val)) {
                 continue;
             }
 
             $arg .= $key . '=' . urldecode($val) . '&';
         }
+
         //去掉最后一个&字符
         $arg && $arg = substr($arg, 0, -1);
 
