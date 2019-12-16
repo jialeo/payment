@@ -12,6 +12,7 @@ use JiaLeo\Payment\Common\PaymentException;
 class AppPay extends BasePay
 {
     public $method = 'alipay.trade.app.pay';
+    public $productCode = 'QUICK_MSECURITY_PAY';
 
     /**
      * 重载handle方法

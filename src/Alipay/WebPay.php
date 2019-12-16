@@ -5,10 +5,12 @@
  */
 
 namespace JiaLeo\Payment\Alipay;
+
 use JiaLeo\Payment\Common\PaymentException;
 
 
 class WebPay extends BasePay
 {
     public $method = 'alipay.trade.page.pay';
+    public $productCode = 'FAST_INSTANT_TRADE_PAY';
 }
