@@ -186,7 +186,7 @@ class BaseAlipay
      */
     public function getPassbackParams($str)
     {
-        $data = urldecode(unserialize($str));
+        $data = unserialize(urldecode($str));
         return $data;
     }
 
