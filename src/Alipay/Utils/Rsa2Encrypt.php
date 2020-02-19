@@ -88,6 +88,7 @@ class Rsa2Encrypt
      */
     public function rsaVerify($data, $sign)
     {
+
         // 初始时，使用公钥key
         $res = openssl_get_publickey($this->key);
         if (empty($res)) {

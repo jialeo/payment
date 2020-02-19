@@ -16,8 +16,15 @@ $config = array(
 	
 	//用户应用私钥(证书路径或key,请填写绝对路径)
 	'rsa_private_key' => '/your/path/cert/alipay/alipay_rsa_private_key.pem',
-	);
-),
+
+  //应用公钥证书(使用公钥证书的时候需要填写,填写绝对路径)
+  'app_cert_path' => '/your/path/cert/alipay/alipay_app_public_key.cert',
+
+  //支付宝根证书(使用公钥证书的时候需要填写,填写绝对路径)
+  'alipay_root_cert_path' => '/your/path/cert/alipay/alipay_root_cert.cert'
+
+);
+
 ```
 
 
@@ -132,3 +139,5 @@ try {
 	throw new ApiException($error_msg);
 }
 
+
+```

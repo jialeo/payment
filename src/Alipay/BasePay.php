@@ -1,17 +1,19 @@
 <?php
 namespace JiaLeo\Payment\Alipay;
 
+use App\Exceptions\ApiException;
 use JiaLeo\Payment\Common\PaymentException;
 use JiaLeo\Payment\Common\Curl;
 
 class BasePay extends BaseAlipay
 {
     protected $method;
+    protected $productCode;
 
     /**
      * 即时到账接口
      */
-    public function handle($params,$is_app = false, $is_qrcode = false)
+    public function handle($params, $is_app = false, $is_qrcode = false)
     {
 
         // 检查订单号是否合法
@@ -36,18 +38,16 @@ class BasePay extends BaseAlipay
             throw new PaymentException('商品类型可取值为：0-虚拟类商品  1-实物类商品');
         }
 
-        if (!$is_qrcode){
-            $params['product_code'] = 'FAST_INSTANT_TRADE_PAY';
+        if (!$is_qrcode) {
+            if (empty($params['product_code'])) {
+                $params['product_code'] = $this->productCode;
+            }
         }
 
         // 返回参数进行urlencode编码
         if (!empty($params['passback_params']) && !is_string($params['passback_params'])) {
             throw new PaymentException('回传参数必须是字符串');
-        } elseif (!empty($params['passback_params'])) {
-            $params['passback_params'] = urlencode($params['passback_params']);
         }
-
-        //dd($params['passback_params']);
 
         $params['total_amount'] = (string)($params['total_amount'] / 100);
 
@@ -62,15 +62,39 @@ class BasePay extends BaseAlipay
             'version' => '1.0',
         );
 
+        if (!empty($this->config['app_cert_path']) && !empty($this->config['alipay_root_cert_path'])) {
+
+            //
+            if (!file_exists($this->config['app_cert_path'])) {
+                throw new PaymentException('应用证书不存在!');
+            }
+
+            if (!file_exists($this->config['alipay_root_cert_path'])) {
+                throw new ApiException('支付宝根证书不存在!');
+            }
+
+            $publicParams['app_cert_sn'] = $this->getCertSN($this->config['app_cert_path']);
+            $publicParams['alipay_root_cert_sn'] = $this->getRootCertSN($this->config['alipay_root_cert_path']);
+        }
+
+        if (!empty($params['notify_url'])) {
+            $publicParams['notify_url'] = $params['notify_url'];
+        }
+
+        if (!empty($params['return_url'])) {
+            $publicParams['return_url'] = $params['return_url'];
+        }
+
+        unset($params['notify_url']);
+        unset($params['return_url']);
+
         //生成biz_content参数
         $biz_content = $params;
-        unset($biz_content['notify_url']);
-        unset($biz_content['return_url']);
         $biz_content = $this->createbizContent($biz_content);
         $publicParams['biz_content'] = $biz_content;
 
         //需要签名的参数
-        $sign_params = array_merge($params, $publicParams);
+        $sign_params = $publicParams;
 
         //参数重新排序
         $sign_params = $this->arraySort($sign_params);
@@ -87,16 +111,16 @@ class BasePay extends BaseAlipay
 
         $sign_params['sign'] = $sign;
 
-        if($is_app) {
+        if ($is_app) {
             return http_build_query($sign_params);
         }
-        if ($is_qrcode){
+
+        if ($is_qrcode) {
             //请求接口获取二维码地址
             $res = Curl::get($this->gateway . '?' . http_build_query($sign_params));//用get方法商品名称不会乱码
 
             return $res;
-        }
-        else {
+        } else {
             return $this->gateway . '?' . http_build_query($sign_params);
         }
     }

@@ -75,23 +75,26 @@ class BaseAlipay
     public function getRsaKeyValue($key, $type = 'private')
     {
         if (is_file($key)) {// 是文件
-            $keyStr = @file_get_contents($key);
+            $rsaKey = @file_get_contents($key);
+            //$res = openssl_get_publickey($keyStr);
         } else {
             $keyStr = $key;
-        }
-        $keyStr = str_replace(PHP_EOL, '', $keyStr);
-        // 为了解决用户传入的密钥格式，这里进行统一处理
-        if ($type === 'private') {
-            $beginStr = ['-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----'];
-            $endStr = ['-----END RSA PRIVATE KEY-----', '-----END PRIVATE KEY-----'];
-        } else {
-            $beginStr = ['-----BEGIN PUBLIC KEY-----', ''];
-            $endStr = ['-----END PUBLIC KEY-----', ''];
-        }
-        $keyStr = str_replace($beginStr, ['', ''], $keyStr);
-        $keyStr = str_replace($endStr, ['', ''], $keyStr);
 
-        $rsaKey = $beginStr[0] . PHP_EOL . wordwrap($keyStr, 64, PHP_EOL, true) . PHP_EOL . $endStr[0];
+            $keyStr = str_replace(PHP_EOL, '', $keyStr);
+
+            // 为了解决用户传入的密钥格式，这里进行统一处理
+            if ($type === 'private') {
+                $beginStr = ['-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----'];
+                $endStr = ['-----END RSA PRIVATE KEY-----', '-----END PRIVATE KEY-----'];
+            } else {
+                $beginStr = ['-----BEGIN PUBLIC KEY-----', ''];
+                $endStr = ['-----END PUBLIC KEY-----', ''];
+            }
+            $keyStr = str_replace($beginStr, ['', ''], $keyStr);
+            $keyStr = str_replace($endStr, ['', ''], $keyStr);
+
+            $rsaKey = $beginStr[0] . PHP_EOL . wordwrap($keyStr, 64, PHP_EOL, true) . PHP_EOL . $endStr[0];
+        }
 
         return $rsaKey;
     }
@@ -110,12 +113,12 @@ class BaseAlipay
 
         reset($para);
         $arg = '';
-        foreach ($para as $key => $val){
+        foreach ($para as $key => $val) {
             if (is_array($val)) {
                 continue;
             }
 
-            $arg .= $key . '=' . urldecode($val) . '&';
+            $arg .= $key . '=' . $val . '&';
         }
 
         //去掉最后一个&字符
@@ -150,7 +153,7 @@ class BaseAlipay
     public function paraFilter($para)
     {
         $paraFilter = [];
-        while (list($key, $val) = each($para)) {
+        foreach ($para as $key => $val) {
             if ($val === '' || $val === null) {
                 continue;
             } else {
@@ -172,12 +175,7 @@ class BaseAlipay
      */
     public function setPassbackParams(array $data)
     {
-        $str_arr = array();
-        foreach ($data as $key => $v) {
-            $str_arr[] = $key . '--' . $v;
-        }
-
-        $str = implode('---', $str_arr);
+        $str = urlencode(serialize($data));
         return $str;
     }
 
@@ -188,14 +186,59 @@ class BaseAlipay
      */
     public function getPassbackParams($str)
     {
-        $str_arr = explode('---', $str);
-        $data = array();
-        foreach ($str_arr as $v) {
-            $temp = explode('--', $v);
-            $data[$temp[0]] = $temp[1];
-        }
+        $data = unserialize(urldecode($str));
         return $data;
     }
 
+    /**
+     * 从证书中提取序列号
+     * @param $cert
+     * @return string
+     */
+    public function getCertSN($certPath)
+    {
+        $cert = file_get_contents($certPath);
+        $ssl = openssl_x509_parse($cert);
+        $SN = md5($this->array2string(array_reverse($ssl['issuer'])) . $ssl['serialNumber']);
+        return $SN;
+    }
 
+    /**
+     * 提取根证书序列号
+     * @param $cert  根证书
+     * @return string|null
+     */
+    public function getRootCertSN($certPath)
+    {
+        $cert = file_get_contents($certPath);
+        $this->alipayRootCertContent = $cert;
+        $array = explode("-----END CERTIFICATE-----", $cert);
+        $SN = null;
+        for ($i = 0; $i < count($array) - 1; $i++) {
+            $ssl[$i] = openssl_x509_parse($array[$i] . "-----END CERTIFICATE-----");
+            if (strpos($ssl[$i]['serialNumber'], '0x') === 0) {
+                $ssl[$i]['serialNumber'] = $this->hex2dec($ssl[$i]['serialNumber']);
+            }
+            if ($ssl[$i]['signatureTypeLN'] == "sha1WithRSAEncryption" || $ssl[$i]['signatureTypeLN'] == "sha256WithRSAEncryption") {
+                if ($SN == null) {
+                    $SN = md5($this->array2string(array_reverse($ssl[$i]['issuer'])) . $ssl[$i]['serialNumber']);
+                } else {
+
+                    $SN = $SN . "_" . md5($this->array2string(array_reverse($ssl[$i]['issuer'])) . $ssl[$i]['serialNumber']);
+                }
+            }
+        }
+        return $SN;
+    }
+
+    public function array2string($array)
+    {
+        $string = [];
+        if ($array && is_array($array)) {
+            foreach ($array as $key => $value) {
+                $string[] = $key . '=' . $value;
+            }
+        }
+        return implode(',', $string);
+    }
 }

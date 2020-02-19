@@ -5,10 +5,11 @@
  */
 
 namespace JiaLeo\Payment\Alipay;
-use JiaLeo\Payment\Common\PaymentException;
 
+use JiaLeo\Payment\Common\PaymentException;
 
 class WapPay extends BasePay
 {
     public $method = 'alipay.trade.wap.pay';
+    public $productCode = 'QUICK_WAP_WAY';
 }
