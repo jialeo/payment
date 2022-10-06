@@ -10,6 +10,8 @@ class BaseAlipay
     public $config = array();
 
     protected $gateway = 'https://openapi.alipay.com/gateway.do';    //支付网关
+    protected $sanboxGateway = 'https://openapi.alipaydev.com/gateway.do';    //沙箱支付网关
+
     public $refundReturnData;  //退款返回的原始数据
 
     public function __construct($config)
@@ -24,6 +26,10 @@ class BaseAlipay
 
         if (empty($config['rsa_private_key'])) {
             throw new PaymentException('缺少配置rsa_private_key');
+        }
+
+        if (isset($config['sanbox']) && $config['sanbox'] == true) {
+            $this->gateway = $this->sanboxGateway;
         }
 
         $this->config = $config;
@@ -124,10 +130,8 @@ class BaseAlipay
         //去掉最后一个&字符
         $arg && $arg = substr($arg, 0, -1);
 
-        //如果存在转义字符，那么去掉转义
-        if (get_magic_quotes_gpc()) {
-            $arg = stripslashes($arg);
-        }
+        //去掉转义
+        $arg = stripslashes($arg);
 
         return $arg;
     }
