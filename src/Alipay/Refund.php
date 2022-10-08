@@ -102,7 +102,7 @@ class Refund extends BaseAlipay
         }
 
         // 验证签名，检查支付宝返回的数据
-        $preStr = json_encode($body['alipay_trade_refund_response']);
+        $preStr = json_encode($body['alipay_trade_refund_response'],JSON_UNESCAPED_UNICODE);
 
         $ali_public_key = $this->getRsaKeyValue($this->config['ali_public_key'], 'public');
         $rsa = new Utils\Rsa2Encrypt($ali_public_key);
