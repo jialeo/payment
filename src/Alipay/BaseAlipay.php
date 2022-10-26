@@ -215,9 +215,9 @@ class BaseAlipay
     public function getRootCertSN($certPath)
     {
         $cert = file_get_contents($certPath);
-        $this->alipayRootCertContent = $cert;
         $array = explode("-----END CERTIFICATE-----", $cert);
         $SN = null;
+
         for ($i = 0; $i < count($array) - 1; $i++) {
             $ssl[$i] = openssl_x509_parse($array[$i] . "-----END CERTIFICATE-----");
             if (strpos($ssl[$i]['serialNumber'], '0x') === 0) {

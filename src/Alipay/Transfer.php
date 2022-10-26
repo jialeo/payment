@@ -53,6 +53,22 @@ class Transfer extends BaseAlipay
             'version' => '1.0',
         );
 
+        if (!empty($this->config['app_cert_path']) && !empty($this->config['alipay_root_cert_path'])) {
+
+            //
+            if (!file_exists($this->config['app_cert_path'])) {
+                throw new PaymentException('应用证书不存在!');
+            }
+
+            if (!file_exists($this->config['alipay_root_cert_path'])) {
+                throw new PaymentException('支付宝根证书不存在!');
+            }
+
+            $publicParams['app_cert_sn'] = $this->getCertSN($this->config['app_cert_path']);
+            $publicParams['alipay_root_cert_sn'] = $this->getRootCertSN($this->config['alipay_root_cert_path']);
+            $publicParams['alipay_root_cert_sn'] = '687b59193f3f462dd5336e5abf83c5d8_02941eef3187dddf3d3b83462e1dfcf6';
+        }
+        
         //生成biz_content参数
         $biz_content = $biz_params;
         $biz_content = $this->createbizContent($biz_content);
@@ -98,7 +114,7 @@ class Transfer extends BaseAlipay
         }
 
         // 验证签名，检查支付宝返回的数据
-        $preStr = json_encode($body['alipay_fund_trans_uni_transfer_response'],JSON_UNESCAPED_UNICODE);
+        $preStr = json_encode($body['alipay_fund_trans_uni_transfer_response'], JSON_UNESCAPED_UNICODE);
 
         $ali_public_key = $this->getRsaKeyValue($this->config['ali_public_key'], 'public');
         $rsa = new Utils\Rsa2Encrypt($ali_public_key);

@@ -1,7 +1,7 @@
 <?php
+
 namespace JiaLeo\Payment\Alipay;
 
-use App\Exceptions\ApiException;
 use JiaLeo\Payment\Common\PaymentException;
 use JiaLeo\Payment\Common\Curl;
 
@@ -70,7 +70,7 @@ class BasePay extends BaseAlipay
             }
 
             if (!file_exists($this->config['alipay_root_cert_path'])) {
-                throw new ApiException('支付宝根证书不存在!');
+                throw new PaymentException('支付宝根证书不存在!');
             }
 
             $publicParams['app_cert_sn'] = $this->getCertSN($this->config['app_cert_path']);
